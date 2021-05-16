@@ -31,7 +31,7 @@ do
     fi
 done
 
-echo "=============================================="
+echo "=========================="
 echo "basic score:$(($score*10))"
 echo "bonus score:$(($bonusScore*10))"
 echo "total score:$((($bonusScore+$score)*10))"

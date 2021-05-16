@@ -85,7 +85,7 @@ module Pipeline_CPU(
 	wire [4:0]  MEMWB_instr_11_7_o;
 	wire [31:0] MEMWB_pc_add4_o;
 
-	assign PCSrc = Branch & zero;
+	assign PCSrc = Branch & branch_zero;
 
 
 	// Create componentes
@@ -141,12 +141,14 @@ module Pipeline_CPU(
 		.IFID_write(IFID_write), 
 		.control_output_select(control_output_select)
 	);
-	MUX_2to1 Mux_control(
-		.data0_i(IFID_instr_o), 
-		.data1_i(Imm_0), 
-		.select_i(control_output_select), 
-		.data_o(Mux_control_o)
-	);
+	
+	// MUX_2to1 Mux_control(
+	// 	.data0_i({ALUSrc, MemtoReg, RegWrite, MemRead, MemWrite, Branch, ALUOp, Jump}), 
+	// 	.data1_i(Imm_0), 
+	// 	.select_i(control_output_select), 
+	// 	.data_o(Mux_control_o)
+	// );
+	
 	Decoder Decoder(
         .instr_i(IFID_instr_o), 
 		.ALUSrc(ALUSrc),
@@ -159,6 +161,12 @@ module Pipeline_CPU(
 		.Jump(Jump)
 	); // given
 
+	MUX_2to1 Mux_control(
+		.data0_i({Jump, ALUOp, ALUSrc, Branch, MemRead, MemWrite, RegWrite, MemtoReg}), 
+		.data1_i(Imm_0), 
+		.select_i(control_output_select), 
+		.data_o({Mux_control_o})
+	);
 
 	Reg_File RF(
         .clk_i(clk_i), 
@@ -171,6 +179,13 @@ module Pipeline_CPU(
         .RSdata_o(RSdata_o), 
         .RTdata_o(RTdata_o)
     ); // given
+
+    Substractor Check_Equal(
+    	.rst_n(rst_i), 
+		.src1(RSdata_o), 
+		.src2(RTdata_o), 
+		.zero(branch_zero)
+    );
 
 	Imm_Gen ImmGen(
 		.instr_i(IFID_instr_o), 
@@ -194,12 +209,12 @@ module Pipeline_CPU(
 		.clk_i(clk_i), 
 		.rst_i(rst_i), 
 		.instr_i(IFID_instr_o), 
-		.WB_i({RegWrite, MemtoReg}), 
-		.Mem_i({Branch, MemRead, MemWrite}), 
-		.Exe_i({ALUOp, ALUSrc}), 
+		.WB_i(Mux_control_o[1:0]), 
+		.Mem_i(Mux_control_o[4:2]), 
+		.Exe_i(Mux_control_o[7:5]), 
 		.data1_i(RSdata_o), 
 		.data2_i(RTdata_o), 
-		.immgen_i(SL1_o), // Imm_Gen_o ?
+		.immgen_i(Imm_Gen_o), 
 		.alu_ctrl_instr({IFID_instr_o[30], IFID_instr_o[14:12]}), 
 		.WBreg_i(IFID_instr_o[11:7]), 
 		.pc_add4_i(IFID_pc_add4_o), 

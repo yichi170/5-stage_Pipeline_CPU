@@ -25,7 +25,7 @@ module alu(
 		end
 	end
 
-	reg signed [32-1:0] a, b, c;
+	reg signed [32-1:0] a, b;
 
 	always @(*) begin
 		a = src1;

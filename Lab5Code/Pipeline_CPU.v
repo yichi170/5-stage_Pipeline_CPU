@@ -42,7 +42,8 @@ module Pipeline_CPU(
 	wire [1:0] ALUSelSrc2;
 	wire [31:0] IF_instr;
 	wire [31:0] pc_add4;
-
+	wire [31:0] Imm_4 = 4;
+	wire [31:0] Imm_0 = 0;
 
 	// Pipeline Signals
 	//////////// IF/ID ////////////
@@ -97,8 +98,8 @@ module Pipeline_CPU(
 
 	Adder PC_plus_4_Adder(
 		.src1_i(pc_o), 
-		.src2_i(pc_add_immediate), 
-		.sum_o(pc_add4)
+		.src2_i(Imm_4), 
+		.sum_o(pc_i)
 	);
 
 	Instr_Memory IM(
