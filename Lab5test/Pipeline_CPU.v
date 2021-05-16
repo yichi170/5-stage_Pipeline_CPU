@@ -9,7 +9,7 @@ module Pipeline_CPU(
 	input rst_i
 ); // I/O port
 
-	// Internal Signles
+//Internal Signles
 	wire [31:0] pc_i;
 	wire [31:0] pc_o;
 	wire [31:0] MuxMemtoReg_o;
@@ -42,6 +42,8 @@ module Pipeline_CPU(
 	wire [1:0] ALUSelSrc2;
 	wire [31:0] IF_instr;
 	wire [31:0] pc_add4;
+	wire [31:0] Imm_4 = 4;
+	wire [31:0] Imm_0 = 0;
 
 
 	// Pipeline Signals
@@ -54,8 +56,8 @@ module Pipeline_CPU(
 
 	//////////// ID/EXE ////////////
 	wire [31:0] IDEXE_instr_o;
-	wire [1:0] IDEXE_WB_o; // TA gave [2:0]
-	wire [1:0] IDEXE_Mem_o;
+	wire [1:0] IDEXE_WB_o; // TA [2:0]
+	wire [2:0] IDEXE_Mem_o; // TA [1:0]
 	wire [2:0] IDEXE_Exe_o;
 	wire [31:0] IDEXE_pc_o;
 	wire [31:0] IDEXE_RSdata_o;
@@ -63,12 +65,12 @@ module Pipeline_CPU(
 	wire [31:0] IDEXE_ImmGen_o;
 	wire [3:0] IDEXE_instr_30_14_12_o;
 	wire [4:0] IDEXE_instr_11_7_o;
-	wire [31:0]IDEXE_pc_add4_o;
+	wire [31:0] IDEXE_pc_add4_o;
 
 	//////////// EXE/MEM ////////////
 	wire [31:0] EXEMEM_instr_o;
-	wire [1:0] EXEMEM_WB_o; // TA gave [2:0]
-	wire [1:0] EXEMEM_Mem_o;
+	wire [1:0] EXEMEM_WB_o; // TA [2:0]
+	wire [2:0] EXEMEM_Mem_o; // TA [1:0]
 	wire [31:0] EXEMEM_pcsum_o;
 	wire EXEMEM_zero_o;
 	wire [31:0] EXEMEM_ALUresult_o;
@@ -77,107 +79,146 @@ module Pipeline_CPU(
 	wire [31:0] EXEMEM_pc_add4_o;
 
 	//////////// MEM/WB ////////////
-	wire [1:0] MEMWB_WB_o; // TA gave [2:0]
+	wire [1:0] MEMWB_WB_o; // TA [2:0]
 	wire [31:0] MEMWB_DM_o;
 	wire [31:0] MEMWB_ALUresult_o;
 	wire [4:0]  MEMWB_instr_11_7_o;
 	wire [31:0] MEMWB_pc_add4_o;
 
+	assign PCSrc = Branch & zero;
+
 
 	// Create componentes
 
 	////////////// IF //////////////
-			
+	MUX_2to1 Mux_PCSrc(
+		.data0_i(pc_add4), 
+		.data1_i(pc_add_immediate), 
+		.select_i(PCSrc), 
+		.data_o(pc_i)
+	);
+
 	ProgramCounter PC(
-		.clk_i(clk_i), 
+        .clk_i(clk_i), 
 	    .rst_i (rst_i), 
+		.PCWrite(PC_write), 
 	    .pc_i(pc_i), 
 	    .pc_o(pc_o)
 	); // given
 
 	Adder PC_plus_4_Adder(
 		.src1_i(pc_o), 
-		.src2_i(pc_add_immediate), 
+		.src2_i(Imm_4), 
 		.sum_o(pc_add4)
 	);
 
 	Instr_Memory IM(
-		.addr_i(pc_o), 
-		.instr_o(IF_instr)
-	);  // given
+        .addr_i(pc_o), 
+	    .instr_o(IF_instr)
+	); // given
 
 	IF_register IFtoID(
 		.clk_i(clk_i), 
 		.rst_i(rst_i), 
+		.IFID_write(IFID_write), 
 		.address_i(pc_o), 
 		.instr_i(IF_instr), 
 		.pc_add4_i(pc_add4), 
+		.flush(IFID_flush), 
 		.address_o(IFID_pc_o), 
 		.instr_o(IFID_instr_o), 
 		.pc_add4_o(IFID_pc_add4_o)
-	);
+    );
 
 	////////////// ID //////////////
 
+	Hazard_detection Hazard_detection_obj(
+		.IFID_regRs(IFID_instr_o[19:15]), 
+		.IFID_regRt(IFID_instr_o[24:20]), 
+		.IDEXE_regRd(IDEXE_instr_11_7_o), 
+		.IDEXE_memRead(IDEXE_Mem_o[1]), 
+		.PC_write(PC_write), 
+		.IFID_write(IFID_write), 
+		.control_output_select(control_output_select)
+	);
+	MUX_2to1 Mux_control(
+		.data0_i(IFID_instr_o), 
+		.data1_i(Imm_0), 
+		.select_i(control_output_select), 
+		.data_o(Mux_control_o)
+	);
 	Decoder Decoder(
-		.instr_i(IFID_instr_o), 
+        .instr_i(IFID_instr_o), 
 		.ALUSrc(ALUSrc),
 		.MemtoReg(MemtoReg),
-		.RegWrite(RegWrite),
+	    .RegWrite(RegWrite),
 		.MemRead(MemRead),
 		.MemWrite(MemWrite),
-		.Branch(Branch),
+	    .Branch(Branch),
 		.ALUOp(ALUOp),
 		.Jump(Jump)
-    );  // given
+	); // given
 
-		 
+
 	Reg_File RF(
-		.clk_i(clk_i), 
-		.rst_i(rst_i), 
-		.RSaddr_i(IFID_instr_o[19:15]), 
-		.RTaddr_i(IFID_instr_o[24:20]), 
-		.RDaddr_i(MEMWB_instr_11_7_o), 
-		.RDdata_i(MuxMemtoReg_o), 
-		.RegWrite_i (MEMWB_WB_o[1]), 
-		.RSdata_o(RSdata_o), 
-		.RTdata_o(RTdata_o)
-	);  // given
-			
+        .clk_i(clk_i), 
+	    .rst_i(rst_i), 
+        .RSaddr_i(IFID_instr_o[19:15]), 
+        .RTaddr_i(IFID_instr_o[24:20]), 
+        .RDaddr_i(MEMWB_instr_11_7_o), 
+        .RDdata_i(MuxMemtoReg_o), 
+        .RegWrite_i (MEMWB_WB_o[1]), 
+        .RSdata_o(RSdata_o), 
+        .RTdata_o(RTdata_o)
+    ); // given
+
 	Imm_Gen ImmGen(
 		.instr_i(IFID_instr_o), 
 		.Imm_Gen_o(Imm_Gen_o)
-	); // ok
+	);
+
+	Shift_Left_1 SL1(
+		.data_i(Imm_Gen_o), 
+		.data_o(SL1_o)
+	);
+
+	Adder Branch_Adder(
+		.src1_i(IFID_pc_o), 
+		.src2_i(SL1_o), 
+		.sum_o(pc_add_immediate)
+	);
+
+	// BEQ or BNE or BLT or BGE
 
 	EXE_register IDtoEXE(
 		.clk_i(clk_i), 
 		.rst_i(rst_i), 
 		.instr_i(IFID_instr_o), 
-		.WB_i({RegWrite, MemtoReg}), // declared [2:0], i dont know where is the 3rd wire? 
-		.Mem_i({MemRead, MemWrite}), // wire Branch not used (bonus)
+		.WB_i({RegWrite, MemtoReg}), 
+		.Mem_i({Branch, MemRead, MemWrite}), 
 		.Exe_i({ALUOp, ALUSrc}), 
 		.data1_i(RSdata_o), 
 		.data2_i(RTdata_o), 
-		.immgen_i(Imm_Gen_o), 
+		.immgen_i(SL1_o), // Imm_Gen_o ?
 		.alu_ctrl_instr({IFID_instr_o[30], IFID_instr_o[14:12]}), 
 		.WBreg_i(IFID_instr_o[11:7]), 
-		.pc_add4_i(IFID_pc_o), // IFID_pc_o or IFID_pc_add4_o
-		// output //
+		.pc_add4_i(IFID_pc_add4_o), 
+		// output
 		.instr_o(IDEXE_instr_o), 
-		.WB_o(IDEXE_WB_o),                       // [2:0] // {RegWrite, MemtoReg}
-		.Mem_o(IDEXE_Mem_o),                     // [1:0] // {MemRead, MemWrite}
-		.Exe_o(IDEXE_Exe_o),                     // [2:0] // {ALUOp, ALUSrc}
+		.WB_o(IDEXE_WB_o), 
+		.Mem_o(IDEXE_Mem_o), 
+		.Exe_o(IDEXE_Exe_o), 
 		.data1_o(IDEXE_RSdata_o), 
 		.data2_o(IDEXE_RTdata_o), 
 		.immgen_o(IDEXE_ImmGen_o), 
-		.alu_ctrl_input(IDEXE_instr_30_14_12_o), // [3:0]
-		.WBreg_o(IDEXE_instr_11_7_o),            // [4:0]
+		.alu_ctrl_input(IDEXE_instr_30_14_12_o), 
+		.WBreg_o(IDEXE_instr_11_7_o), 
 		.pc_add4_o(IDEXE_pc_add4_o)
-	);
-		
-	////////////// EXE //////////////
+	); // IDEXE_pc_o
 
-	MUX_2to1 Mux_ALUSrc( // choose between data2 and immediate
+
+	////////////// EXE //////////////
+	MUX_2to1 Mux_ALUSrc(
 		.data0_i(IDEXE_RTdata_o), 
 		.data1_i(IDEXE_ImmGen_o), 
 		.select_i(IDEXE_Exe_o[0]), 
@@ -193,7 +234,8 @@ module Pipeline_CPU(
 		.WB_Control(MEMWB_WB_o), 
 		.src1_sel_o(ALUSelSrc1), 
 		.src2_sel_o(ALUSelSrc2)
-	); // ok
+	);
+
 
 	MUX_3to1 MUX_ALU_src1(
 		.data0_i(IDEXE_RSdata_o), 
@@ -215,7 +257,8 @@ module Pipeline_CPU(
 		.instr(IDEXE_instr_30_14_12_o),
         .ALUOp(IDEXE_Exe_o[2:1]),
         .ALU_Ctrl_o(ALU_Ctrl_o)
-	); // ok
+	);
+
 
 	alu alu(
 		.rst_n(rst_i), 
@@ -241,24 +284,24 @@ module Pipeline_CPU(
 		.pc_add4_i(IDEXE_pc_add4_o), 
 		// output //
 		.instr_o(EXEMEM_instr_o), 
-		.WB_o(EXEMEM_WB_o), // [2:0]
-		.Mem_o(EXEMEM_Mem_o), // declared [2:0], but should be [1:0]
+		.WB_o(EXEMEM_WB_o), 
+		.Mem_o(EXEMEM_Mem_o), 
 		.zero_o(EXEMEM_zero_o), 
 		.alu_ans_o(EXEMEM_ALUresult_o), 
 		.rtdata_o(EXEMEM_RTdata_o), 
-		.WBreg_o(EXEMEM_instr_11_7_o), // RD, [4:0]
-		.pc_add4_o(EXEMEM_pc_add4_o)
-	); // EXEMEM_pcsum_o
+		.WBreg_o(EXEMEM_instr_11_7_o), 
+		.pc_add4_o(EXEMEM_pc_add4_o)	
+    ); // EXEMEM_pcsum_o
 
 	////////////// MEM //////////////
 
 	Data_Memory Data_Memory(
-        .clk_i(clk_i),
-        .addr_i(EXEMEM_ALUresult_o),
-        .data_i(EXEMEM_RTdata_o),
-        .MemRead_i(EXEMEM_Mem_o[1]),
-        .MemWrite_i(EXEMEM_Mem_o[0]),
-        .data_o(DM_o)
+		.clk_i(clk_i),
+		.addr_i(EXEMEM_ALUresult_o),
+		.data_i(EXEMEM_RTdata_o),
+		.MemRead_i(EXEMEM_Mem_o[1]),
+		.MemWrite_i(EXEMEM_Mem_o[0]),
+		.data_o(DM_o)
 	);
 
 	WB_register MEMtoWB(
@@ -275,13 +318,15 @@ module Pipeline_CPU(
 		.alu_ans_o(MEMWB_ALUresult_o), 
 		.WBreg_o(MEMWB_instr_11_7_o), 
 		.pc_add4_o(MEMWB_pc_add4_o)
-	);
+    );
 
 	////////////// WB //////////////
 
+	// MUX_3to1 Mux_MemtoReg(
 	MUX_2to1 Mux_MemtoReg(
 		.data0_i(MEMWB_DM_o), 
 		.data1_i(MEMWB_ALUresult_o), 
+		// .data2_i(), 
 		.select_i(MEMWB_WB_o[0]), 
 		.data_o(MuxMemtoReg_o)
 	);

@@ -1,6 +1,6 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
-Student ID: 0816032 0816102
+Student Name: 
+Student ID: 
 ***************************************************/
 
 `timescale 1ns/1ps
@@ -15,7 +15,7 @@ module Decoder(
 	output wire			MemWrite,
 	output wire			MemtoReg,
 	output wire 		Jump
-);
+	);
 	
 //Internal Signals
 wire	[7-1:0]		opcode;

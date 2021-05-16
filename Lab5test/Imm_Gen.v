@@ -39,5 +39,5 @@ module Imm_Gen(
             default: Imm_Gen_o_reg = 0;
         endcase // opcode
     end
-
+	
 endmodule

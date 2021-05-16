@@ -56,8 +56,8 @@ module Pipeline_CPU(
 
 	//////////// ID/EXE ////////////
 	wire [31:0] IDEXE_instr_o;
-	wire [2:0] IDEXE_WB_o;
-	wire [1:0] IDEXE_Mem_o;
+	wire [1:0] IDEXE_WB_o; // TA [2:0]
+	wire [2:0] IDEXE_Mem_o; // TA [1:0]
 	wire [2:0] IDEXE_Exe_o;
 	wire [31:0] IDEXE_pc_o;
 	wire [31:0] IDEXE_RSdata_o;
@@ -69,8 +69,8 @@ module Pipeline_CPU(
 
 	//////////// EXE/MEM ////////////
 	wire [31:0] EXEMEM_instr_o;
-	wire [2:0] EXEMEM_WB_o;
-	wire [1:0] EXEMEM_Mem_o;
+	wire [1:0] EXEMEM_WB_o; // TA [2:0]
+	wire [2:0] EXEMEM_Mem_o; // TA [1:0]
 	wire [31:0] EXEMEM_pcsum_o;
 	wire EXEMEM_zero_o;
 	wire [31:0] EXEMEM_ALUresult_o;
@@ -79,7 +79,7 @@ module Pipeline_CPU(
 	wire [31:0] EXEMEM_pc_add4_o;
 
 	//////////// MEM/WB ////////////
-	wire [2:0] MEMWB_WB_o;
+	wire [1:0] MEMWB_WB_o; // TA [2:0]
 	wire [31:0] MEMWB_DM_o;
 	wire [31:0] MEMWB_ALUresult_o;
 	wire [4:0]  MEMWB_instr_11_7_o;
@@ -109,7 +109,7 @@ module Pipeline_CPU(
 	Adder PC_plus_4_Adder(
 		.src1_i(pc_o), 
 		.src2_i(Imm_4), 
-		.sum_o(pc_add4), 
+		.sum_o(pc_add4)
 	);
 
 	Instr_Memory IM(
@@ -148,7 +148,7 @@ module Pipeline_CPU(
 		.data_o(Mux_control_o)
 	);
 	Decoder Decoder(
-        .instr_i(Mux_control_o), // ???? given IFID_instr_o, change to Mux_control_o
+        .instr_i(IFID_instr_o), 
 		.ALUSrc(ALUSrc),
 		.MemtoReg(MemtoReg),
 	    .RegWrite(RegWrite),
@@ -185,7 +185,7 @@ module Pipeline_CPU(
 	Adder Branch_Adder(
 		.src1_i(IFID_pc_o), 
 		.src2_i(SL1_o), 
-		.sum_o(pc_add_immediate), 
+		.sum_o(pc_add_immediate)
 	);
 
 	// BEQ or BNE or BLT or BGE

@@ -1,6 +1,6 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
-Student ID: 0816032 0816102
+Student Name: 
+Student ID: 
 ***************************************************/
 
 `timescale 1ns / 1ps
@@ -14,7 +14,7 @@ reg clk, rst_n;
 Pipeline_CPU CPU(
 	.clk_i(clk),
 	.rst_i(rst_n)
-);
+	);
 
 always #(`CYCLE_TIME/2) clk = ~clk;	
 

@@ -4,20 +4,16 @@ Student ID: 0816032 0816102
 ***************************************************/
 
 module ForwardingUnit (
-	EXE_instr19_15, // RS
-	EXE_instr24_20, // RT
-	MEM_instr11_7, // RD
-	MEM_WBControl, 
-	WB_instr11_7, // RD
-	WB_Control, 
-	src1_sel_o, 
-	src2_sel_o
+	input [5-1:0] EXE_instr19_15, 
+	input [5-1:0] EXE_instr24_20, 
+	input [5-1:0] MEM_instr11_7, 
+	input [2-1:0] MEM_WBControl, 
+	input [5-1:0] WB_instr11_7, 
+	input [2-1:0] WB_Control, 
+	output wire [2-1:0] src1_sel_o, 
+	output wire [2-1:0] src2_sel_o
 );
-
-	input [5-1:0] EXE_instr19_15, EXE_instr24_20, MEM_instr11_7, WB_instr11_7;
-	input [2-1:0] MEM_WBControl, WB_Control;
-	output wire [2-1:0] src1_sel_o, src2_sel_o; // forwarding A, B
-
+	
 	wire MEM_Regwrite, Regwrite;
 	reg [1:0] sel1_o_reg, sel2_o_reg;
 
@@ -49,6 +45,7 @@ module ForwardingUnit (
 		end
 		
 	end
+	
 
 endmodule
  

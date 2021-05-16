@@ -10,10 +10,10 @@ module ALU_Ctrl(
 	input		[2-1:0]	ALUOp,
 	output wire	[4-1:0] ALU_Ctrl_o
 );
-
+	
+	/* Write your code HERE */
 	wire [2:0] func3;
  	assign func3 = instr[2:0]; // instr[14:12]
- 	/* Write your code HERE */
 
  	reg [3:0] ALU_Ctrl_o_reg;
  	assign ALU_Ctrl_o = ALU_Ctrl_o_reg;

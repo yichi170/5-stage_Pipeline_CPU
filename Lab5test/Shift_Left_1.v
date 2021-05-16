@@ -9,7 +9,7 @@ module Shift_Left_1(
     input  		[32-1:0] data_i,
     output wire [32-1:0] data_o
 );
-
+	
 	assign data_o = data_i << 1;
 
 endmodule

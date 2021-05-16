@@ -15,7 +15,7 @@ module alu(
 	output reg              overflow       // 1 bit overflow            (output)
 );
 
-/* Write your code HERE */
+	/* Write your code HERE */
 	always @(negedge rst_n) begin
 		if (~rst_n) begin
 			result <= 0;
@@ -39,10 +39,10 @@ module alu(
 				result = a | b;
 			end
 			4'b0010: begin // Add
-				{cout, result} = 33'b0 + a + b;
+				result = a + b;
 			end
 			4'b0110: begin // Sub
-				{cout, result} =33'b0 + a + (~b) + 1;
+				result = a - b;
 			end
 			4'b0111: begin // Set Less Than
 				result[0] = (a < b);
@@ -53,6 +53,8 @@ module alu(
 			end
 		endcase
 		zero = ~(|result);
+		cout = 0;
+		overflow = 0;
 	end
 
 endmodule
