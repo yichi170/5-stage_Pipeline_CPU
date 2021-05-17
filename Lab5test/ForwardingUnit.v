@@ -7,9 +7,9 @@ module ForwardingUnit (
 	input [5-1:0] EXE_instr19_15, 
 	input [5-1:0] EXE_instr24_20, 
 	input [5-1:0] MEM_instr11_7, 
-	input [2-1:0] MEM_WBControl, 
+	input [3-1:0] MEM_WBControl, 
 	input [5-1:0] WB_instr11_7, 
-	input [2-1:0] WB_Control, 
+	input [3-1:0] WB_Control, 
 	output wire [2-1:0] src1_sel_o, 
 	output wire [2-1:0] src2_sel_o
 );
@@ -17,8 +17,8 @@ module ForwardingUnit (
 	wire MEM_Regwrite, Regwrite;
 	reg [1:0] sel1_o_reg, sel2_o_reg;
 
-	assign Regwrite = WB_Control[1];
-	assign MEM_Regwrite = MEM_WBControl[1];
+	assign Regwrite = WB_Control[2];
+	assign MEM_Regwrite = MEM_WBControl[2];
 
 	assign src1_sel_o = sel1_o_reg;
 	assign src2_sel_o = sel2_o_reg;

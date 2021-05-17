@@ -22,9 +22,10 @@ module Pipeline_CPU(
 	wire [31:0] ALUSrc1_o;
 	wire [31:0] ALUSrc2_o;
 	wire [7:0] Mux_control_o;
+	wire [23:0] Mux_control_notuse_i, Mux_control_notuse_o;
 
 	wire [31:0] pc_add_immediate;
-	wire [1:0] ALUOp;
+	wire [1:0] ALUOp, WriteBack;
 	wire PC_write;
 	wire ALUSrc; 
 	wire RegWrite;
@@ -56,8 +57,8 @@ module Pipeline_CPU(
 
 	//////////// ID/EXE ////////////
 	wire [31:0] IDEXE_instr_o;
-	wire [1:0] IDEXE_WB_o; // TA [2:0]
-	wire [2:0] IDEXE_Mem_o; // TA [1:0]
+	wire [2:0] IDEXE_WB_o;
+	wire [1:0] IDEXE_Mem_o;
 	wire [2:0] IDEXE_Exe_o;
 	wire [31:0] IDEXE_pc_o;
 	wire [31:0] IDEXE_RSdata_o;
@@ -69,8 +70,8 @@ module Pipeline_CPU(
 
 	//////////// EXE/MEM ////////////
 	wire [31:0] EXEMEM_instr_o;
-	wire [1:0] EXEMEM_WB_o; // TA [2:0]
-	wire [2:0] EXEMEM_Mem_o; // TA [1:0]
+	wire [2:0] EXEMEM_WB_o;
+	wire [1:0] EXEMEM_Mem_o;
 	wire [31:0] EXEMEM_pcsum_o;
 	wire EXEMEM_zero_o;
 	wire [31:0] EXEMEM_ALUresult_o;
@@ -79,7 +80,7 @@ module Pipeline_CPU(
 	wire [31:0] EXEMEM_pc_add4_o;
 
 	//////////// MEM/WB ////////////
-	wire [1:0] MEMWB_WB_o; // TA [2:0]
+	wire [2:0] MEMWB_WB_o;
 	wire [31:0] MEMWB_DM_o;
 	wire [31:0] MEMWB_ALUresult_o;
 	wire [4:0]  MEMWB_instr_11_7_o;
@@ -152,7 +153,8 @@ module Pipeline_CPU(
 	Decoder Decoder(
         .instr_i(IFID_instr_o), 
 		.ALUSrc(ALUSrc),
-		.MemtoReg(MemtoReg), // 1 -> 2 待做
+		// .MemtoReg(MemtoReg), // 1 -> 2 待做
+		.WriteBack(WriteBack), 
 	    .RegWrite(RegWrite),
 		.MemRead(MemRead),
 		.MemWrite(MemWrite),
@@ -162,10 +164,10 @@ module Pipeline_CPU(
 	); // given
 
 	MUX_2to1 Mux_control(
-		.data0_i({ALUOp, ALUSrc, MemRead, MemWrite, RegWrite, MemtoReg}), 
+		.data0_i({Mux_control_notuse_i, ALUOp, ALUSrc, MemRead, MemWrite, RegWrite, WriteBack}), 
 		.data1_i(Imm_0), 
 		.select_i(control_output_select), 
-		.data_o({Mux_control_o})
+		.data_o({Mux_control_notuse_o, Mux_control_o})
 	);
 
 	Reg_File RF(
@@ -175,7 +177,7 @@ module Pipeline_CPU(
         .RTaddr_i(IFID_instr_o[24:20]), 
         .RDaddr_i(MEMWB_instr_11_7_o), 
         .RDdata_i(MuxMemtoReg_o), 
-        .RegWrite_i (MEMWB_WB_o[1]), 
+        .RegWrite_i (MEMWB_WB_o[2]), 
         .RSdata_o(RSdata_o), 
         .RTdata_o(RTdata_o)
     ); // given
@@ -209,8 +211,8 @@ module Pipeline_CPU(
 		.clk_i(clk_i), 
 		.rst_i(rst_i), 
 		.instr_i(IFID_instr_o), 
-		.WB_i(Mux_control_o[1:0]), 
-		.Mem_i(Mux_control_o[4:2]), 
+		.WB_i(Mux_control_o[2:0]), 
+		.Mem_i(Mux_control_o[4:3]), 
 		.Exe_i(Mux_control_o[7:5]), 
 		.data1_i(RSdata_o), 
 		.data2_i(RTdata_o), 
@@ -350,7 +352,7 @@ module Pipeline_CPU(
 		.data0_i(MEMWB_DM_o), 
 		.data1_i(MEMWB_ALUresult_o), 
 		.data2_i(MEMWB_pc_add4_o), 
-		.select_i(MEMWB_WB_o[0]), 
+		.select_i(MEMWB_WB_o[1:0]), 
 		.data_o(MuxMemtoReg_o)
 	);
 

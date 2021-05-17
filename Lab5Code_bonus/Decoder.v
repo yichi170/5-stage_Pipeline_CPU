@@ -1,6 +1,6 @@
 /***************************************************
-Student Name: 
-Student ID: 
+Student Name: 李懿麒 陳品戎
+Student ID: 0816032 0816102
 ***************************************************/
 
 `timescale 1ns/1ps
@@ -13,7 +13,8 @@ module Decoder(
 	output wire [2-1:0]	ALUOp,
 	output wire			MemRead,
 	output wire			MemWrite,
-	output wire			MemtoReg,
+	// output wire			MemtoReg,
+	output wire [2-1:0]	WriteBack,
 	output wire 		Jump
 	);
 	
@@ -48,12 +49,14 @@ assign Ctrl_o = (Instr_field == 0 && opcode[5] == 0) ? 10'b0010100010 : (
 				(Instr_field == 1) ? 10'b0010100011 : (
 				(Instr_field == 2) ? 10'b0010001000 : (
 				(Instr_field == 3) ? 10'b0000000101 : (
-				(Instr_field == 4) ? 10'b0100100000 : ( // JAL
+				(Instr_field == 4) ? 10'b1100100000 : ( // JAL
+				// (Instr_field == 4) ? 10'b0100100000 : ( // JAL
 				0))))))));
 
 assign Jump     = Ctrl_o[8];
 assign ALUSrc 	= Ctrl_o[7];
-assign MemtoReg = Ctrl_o[6];
+// assign MemtoReg = Ctrl_o[6];
+assign WriteBack = {Ctrl_o[9], Ctrl_o[6]};
 assign RegWrite = Ctrl_o[5];
 assign MemRead  = Ctrl_o[4];
 assign MemWrite = Ctrl_o[3];
@@ -64,7 +67,3 @@ endmodule
 
 
 
-
-
-                    
-                    
