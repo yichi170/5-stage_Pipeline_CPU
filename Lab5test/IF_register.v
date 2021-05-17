@@ -21,19 +21,14 @@ module IF_register (
 			address_o <= 0;
 			instr_o <= 0;
 			pc_add4_o <= 0;
-		end else if(flush) begin
-			address_o <= 0;
-			instr_o <= 0;
-			pc_add4_o <= 0;
+		// end else if(flush) begin
+			// address_o <= 0;
+			// instr_o <= 0;
+			// pc_add4_o <= 0;
 		end else if(IFID_write) begin
 			address_o <= address_i;
 			instr_o <= instr_i;
 			pc_add4_o <= pc_add4_i;
-		end
-		else begin
-			address_o <= 0;
-			instr_o <= 0;
-			pc_add4_o <= 0;
 		end
 	end
 
