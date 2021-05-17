@@ -51,12 +51,12 @@ assign Ctrl_o = (Instr_field == 0 && opcode[5] == 0) ? 10'b0010100010 : (
 				(Instr_field == 4) ? 10'b0100100000 : ( // JAL
 				0))))))));
 
-assign Jump = Ctrl_o[8];
+assign Jump     = Ctrl_o[8];
 assign ALUSrc 	= Ctrl_o[7];
-assign MemtoReg= Ctrl_o[6];
+assign MemtoReg = Ctrl_o[6];
 assign RegWrite = Ctrl_o[5];
-assign MemRead= Ctrl_o[4];
-assign MemWrite= Ctrl_o[3];
+assign MemRead  = Ctrl_o[4];
+assign MemWrite = Ctrl_o[3];
 assign Branch	= Ctrl_o[2];
 assign ALUOp 	= {Ctrl_o[1:0]};
 
