@@ -1,6 +1,6 @@
 /***************************************************
-Student Name: 
-Student ID: 
+Student Name: 李懿麒 陳品戎
+Student ID: 0816032 0816102
 ***************************************************/
 
 `timescale 1ns/1ps
@@ -15,9 +15,9 @@ module ProgramCounter(
  
 //Main function
 always @(posedge clk_i) begin
-		if(~rst_i)
+		if (~rst_i)
 			pc_o <= 0;
-		else if(PCWrite)
+		else if (PCWrite)
 			pc_o <= pc_i;
 	end
 
