@@ -349,8 +349,8 @@ module Pipeline_CPU(
 	// );
 
 	MUX_3to1 Mux_MemtoReg(
-		.data0_i(MEMWB_DM_o), 
-		.data1_i(MEMWB_ALUresult_o), 
+		.data0_i(MEMWB_ALUresult_o), 
+		.data1_i(MEMWB_DM_o), 
 		.data2_i(MEMWB_pc_add4_o), 
 		.select_i(MEMWB_WB_o[1:0]), 
 		.data_o(MuxMemtoReg_o)

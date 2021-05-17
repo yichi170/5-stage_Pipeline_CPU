@@ -29,11 +29,23 @@ module ALU_Ctrl(
 					4'b1000: ALU_Ctrl_o_reg = 4'b0110; // sub
 					4'b0111: ALU_Ctrl_o_reg = 4'b0000; // and
 					4'b0110: ALU_Ctrl_o_reg = 4'b0001; // or
+					4'b0100: ALU_Ctrl_o_reg = 4'b0011; // xor
 					4'b0010: ALU_Ctrl_o_reg = 4'b0111; // slt
+					4'b0001: ALU_Ctrl_o_reg = 4'b0100; // sll
 					default: ALU_Ctrl_o_reg = 4'b0000;
 				endcase
 			end
-			2'b11: ALU_Ctrl_o_reg = 4'b0010; // addi
+			2'b11: begin/*-----------I-type-----------*/
+				case (func3)
+					3'b000: ALU_Ctrl_o_reg = 4'b0010; // addi
+					3'b111: ALU_Ctrl_o_reg = 4'b0000; // andi
+					3'b110: ALU_Ctrl_o_reg = 4'b0001; // ori
+					3'b100: ALU_Ctrl_o_reg = 4'b0011; // xori
+					3'b010: ALU_Ctrl_o_reg = 4'b0111; // slti
+					3'b001: ALU_Ctrl_o_reg = 4'b0100; // slli
+					default: ALU_Ctrl_o_reg = 4'b0000;
+				endcase
+			end
 			default: ALU_Ctrl_o_reg = 4'b1111;
 		endcase
 	end

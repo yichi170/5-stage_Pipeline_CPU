@@ -24,7 +24,7 @@ module ForwardingUnit (
 	assign src2_sel_o = sel2_o_reg;
 
 	always @(*) begin
-		if ((MEM_Regwrite) && (~MEM_instr11_7)) begin
+		if ((MEM_Regwrite) && (MEM_instr11_7 != 0)) begin
 			if (MEM_instr11_7 == EXE_instr19_15)
 				sel1_o_reg = 2'b10;
 			else if (WB_instr11_7 == EXE_instr19_15)

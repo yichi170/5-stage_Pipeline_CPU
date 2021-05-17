@@ -45,8 +45,14 @@ module alu(
 				result = a - b;
 			end
 			4'b0111: begin // Set Less Than
-				result[0] = (a < b);
+				result[0] = (src1 < src2);
 				result[31:1] = 0;
+			end
+			4'b0011: begin // Xor
+				result = src1 ^ src2;
+			end
+			4'b0100: begin // shift left logical
+				result = src1 << src2;
 			end
 			default: begin
 				result = result;
