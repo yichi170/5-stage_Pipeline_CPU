@@ -87,6 +87,7 @@ module Pipeline_CPU(
 	wire [31:0] MEMWB_pc_add4_o;
 
 	assign PCSrc = (Branch & branch_zero) | Jump;
+	assign IFID_flush = Branch & branch_zero | Jump;
 
 
 	// Create componentes
@@ -201,7 +202,8 @@ module Pipeline_CPU(
 
 	Adder Branch_Adder(
 		.src1_i(IFID_pc_o), 
-		.src2_i(SL1_o), 
+		.src2_i(Imm_Gen_o), 
+		// .src2_i(SL1_o), 
 		.sum_o(pc_add_immediate)
 	);
 
