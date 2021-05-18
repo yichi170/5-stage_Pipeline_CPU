@@ -1,5 +1,5 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 
@@ -7,7 +7,7 @@ module EXE_register (
 	input clk_i, 
 	input rst_i, 
 	input [31:0] instr_i, 
-	input [1:0] WB_i, // TA gave [2:0]
+	input [2:0] WB_i, 
 	input [1:0] Mem_i, 
 	input [2:0] Exe_i, 
 	input [31:0] data1_i, 
@@ -18,7 +18,7 @@ module EXE_register (
 	input [31:0] pc_add4_i, 
 
 	output reg [31:0] instr_o, 
-	output reg [1:0] WB_o, // TA gave [2:0]
+	output reg [2:0] WB_o, 
 	output reg [1:0] Mem_o, 
 	output reg [2:0] Exe_o, 
 	output reg [31:0] data1_o, 

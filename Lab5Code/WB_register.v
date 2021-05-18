@@ -1,24 +1,24 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 
 module WB_register (
 	input clk_i, 
 	input rst_i, 
-	input [1:0] WB_i, // TA gave [2:0]
+	input [2:0] WB_i, 
 	input [31:0] DM_i, 
 	input [31:0] alu_ans_i, 
 	input [4:0] WBreg_i, 
 	input [31:0] pc_add4_i, 
 	
-	output reg [1:0] WB_o, // TA gave [2:0]
+	output reg [2:0] WB_o, 
 	output reg [31:0] DM_o, 
 	output reg [31:0] alu_ans_o, 
 	output reg [4:0] WBreg_o, 
 	output reg [31:0] pc_add4_o
 );
-	
+
 	always @(posedge clk_i) begin
 		if(~rst_i) begin
 			WB_o <= 0;
@@ -34,6 +34,5 @@ module WB_register (
 			pc_add4_o <= pc_add4_i;
 		end
 	end
-	
 
 endmodule

@@ -1,5 +1,5 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 
@@ -10,11 +10,12 @@ Student ID: 0816032 0816102
 module testbench;
 
 reg clk, rst_n;
+integer     count;
 
 Pipeline_CPU CPU(
 	.clk_i(clk),
 	.rst_i(rst_n)
-);
+	);
 
 always #(`CYCLE_TIME/2) clk = ~clk;	
 
@@ -27,6 +28,7 @@ integer fp_w;
 initial begin
 	fp_w = $fopen("result.txt","w");
 	clk = 0;
+	count = 0;
 	rst_n = 0;
 	#(`CYCLE_TIME) rst_n = 1;
 	#(`CYCLE_TIME*`END_COUNT) 
@@ -35,7 +37,8 @@ initial begin
 end
 
 always@(posedge clk) begin
-	if(rst_n) begin
+    count = count + 1;
+	if( count == `END_COUNT ) begin 
 		$display("PC = %d", CPU.PC.pc_o);
 		$display("Data Memory = %d, %d, %d, %d, %d, %d, %d, %d",CPU.Data_Memory.memory[0], CPU.Data_Memory.memory[1], CPU.Data_Memory.memory[2], CPU.Data_Memory.memory[3], CPU.Data_Memory.memory[4], CPU.Data_Memory.memory[5], CPU.Data_Memory.memory[6], CPU.Data_Memory.memory[7]);
 		$display("Data Memory = %d, %d, %d, %d, %d, %d, %d, %d",CPU.Data_Memory.memory[8], CPU.Data_Memory.memory[9], CPU.Data_Memory.memory[10], CPU.Data_Memory.memory[11], CPU.Data_Memory.memory[12], CPU.Data_Memory.memory[13], CPU.Data_Memory.memory[14], CPU.Data_Memory.memory[15]);

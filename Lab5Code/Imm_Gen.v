@@ -1,5 +1,5 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 
@@ -24,7 +24,7 @@ module Imm_Gen(
 
     always @(*) begin
         case (opcode)
-            7'b0010011, 7'b0000011, 7'b1100111: begin : Itype
+            7'b0010011, 7'b0000011, 7'b1100111: begin : Itype // I, LW, JALR
                 Imm_Gen_o_reg = { {21{instr_i[31]}}, instr_i[30:20] };
             end
             7'b0100011: begin : Stype
@@ -39,5 +39,5 @@ module Imm_Gen(
             default: Imm_Gen_o_reg = 0;
         endcase // opcode
     end
-
+	
 endmodule

@@ -1,5 +1,5 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 
@@ -15,7 +15,7 @@ module Reg_File(
     input           	 RegWrite_i,
     output wire [32-1:0] RSdata_o,
     output wire [32-1:0] RTdata_o
-);
+    );
           
 reg signed [32-1:0] Reg_File [0:32-1];     
 

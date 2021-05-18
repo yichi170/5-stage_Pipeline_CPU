@@ -1,5 +1,5 @@
 rm -rf Lab5test
-cp -r Lab5Code_bonus Lab5test
+cp -r Lab5Code Lab5test
 cd Lab5test
 mkdir -p result
 for ((i=1;i<=13;i++))

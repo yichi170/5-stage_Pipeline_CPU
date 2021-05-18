@@ -1,5 +1,5 @@
 /***************************************************
-Student Name: 李懿麒 陳品戎
+Student Name: 李懿麒 陳品戎 (Lab5)
 Student ID: 0816032 0816102
 ***************************************************/
 `timescale 1ns/1ps
@@ -15,7 +15,7 @@ module alu(
 	output reg              overflow       // 1 bit overflow            (output)
 );
 
-/* Write your code HERE */
+	/* Write your code HERE */
 	always @(negedge rst_n) begin
 		if (~rst_n) begin
 			result <= 0;
@@ -25,7 +25,7 @@ module alu(
 		end
 	end
 
-	reg signed [32-1:0] a, b, c;
+	reg signed [32-1:0] a, b;
 
 	always @(*) begin
 		a = src1;
@@ -39,20 +39,28 @@ module alu(
 				result = a | b;
 			end
 			4'b0010: begin // Add
-				{cout, result} = 33'b0 + a + b;
+				result = a + b;
 			end
 			4'b0110: begin // Sub
-				{cout, result} =33'b0 + a + (~b) + 1;
+				result = a - b;
 			end
 			4'b0111: begin // Set Less Than
-				result[0] = (a < b);
+				result[0] = (src1 < src2);
 				result[31:1] = 0;
+			end
+			4'b0011: begin // Xor
+				result = src1 ^ src2;
+			end
+			4'b0100: begin // shift left logical
+				result = src1 << src2;
 			end
 			default: begin
 				result = result;
 			end
 		endcase
 		zero = ~(|result);
+		cout = 0;
+		overflow = 0;
 	end
 
 endmodule
