@@ -29,7 +29,7 @@ This is the lab work for Computer Organization. Our goal is to implement RISC-V 
   - jal
 
 ## Architechure Diagram
-
+![image](https://github.com/yichi170/5-stage_Pipeline_CPU/blob/main/Architechure%20Diagram.png)
 ## Data Hazard
 
 Our Implementation supports data forwarding to prevent data hazard. Therefore, Hazard Detection Unit can avoid load-use data hazard.
